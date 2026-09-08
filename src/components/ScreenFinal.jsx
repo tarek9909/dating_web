@@ -8,7 +8,7 @@ export default function ScreenFinal({ selections, onRestart, config = {}, onComp
   const [copied, setCopied] = useState(false);
 
   const recipientName = config.recipientName || 'Dana';
-  const whatsappPhone = config.whatsappPhone || '96171273152';
+  const whatsappPhone = config.whatsappPhone || '96181784130';
   const ticketNum = config.ticketCode || `#${recipientName.toUpperCase().slice(0, 4)}-001`;
   const dateValue = config.dateText || selections.when || 'Tomorrow';
   const timeValue = config.timeText || '6:00 PM';

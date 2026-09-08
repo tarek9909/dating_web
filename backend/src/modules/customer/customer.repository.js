@@ -134,13 +134,23 @@ export const customerRepository = {
     return {
       invitation: inv,
       content,
+      theme: {
+        id: inv.theme_id || 1,
+        name: inv.theme_name || 'Romantic Velvet',
+        primaryColor: inv.primary_color || '#ff4d6d',
+        secondaryColor: inv.secondary_color || '#ff758f',
+        backgroundColor: inv.background_color || '#0f0207',
+        textColor: inv.text_color || '#ffffff',
+        fontFamily: inv.font_family || 'Outfit',
+        configuration: inv.theme_config || null,
+      },
       locations,
       foodOptions: foods,
       media: mediaMap,
     };
   },
 
-  async updateInvitationDetails(invitationId, { recipientName, dateType, scheduleMode, dateValue, dateText, timeValue, timezone, dressCode, dressCodeText, internalTitle }) {
+  async updateInvitationDetails(invitationId, { recipientName, dateType, scheduleMode, dateValue, dateText, timeValue, timezone, dressCode, dressCodeText, internalTitle, themeId }) {
     await pool.execute(
       `UPDATE invitations
        SET recipient_name = COALESCE(?, recipient_name),
@@ -152,12 +162,14 @@ export const customerRepository = {
            timezone = COALESCE(?, timezone),
            dress_code = COALESCE(?, dress_code),
            dress_code_text = COALESCE(?, dress_code_text),
-           internal_title = COALESCE(?, internal_title)
+           internal_title = COALESCE(?, internal_title),
+           theme_id = COALESCE(?, theme_id)
        WHERE id = ?`,
       [
         recipientName || null, dateType || null, scheduleMode || null, dateValue || null,
         dateText || null, timeValue || null, timezone || null,
         dressCode || null, dressCodeText || null, internalTitle || null,
+        themeId || null,
         invitationId
       ]
     );
@@ -175,7 +187,7 @@ export const customerRepository = {
       'food_title', 'food_subtitle', 'when_title', 'when_subtitle',
       'dress_code_title', 'dress_code_subtitle', 'dress_code_checklist',
       'opening_gif', 'angry_gif', 'when_gif', 'dress_gif', 'final_gif',
-      'final_title', 'final_message'
+      'final_title', 'final_message', 'theme_accent_color'
     ];
 
     allowedKeys.forEach((k) => {

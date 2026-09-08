@@ -176,15 +176,18 @@ export const publicRepository = {
         final: {
           title: content.final_title,
           message: content.final_message,
-        }
+        },
+        themeAccentColor: content.theme_accent_color || null,
       },
       theme: {
+        id: inv.theme_id || 1,
         name: inv.theme_name || 'Romantic Velvet',
         primaryColor: inv.primary_color || '#ff4d6d',
         secondaryColor: inv.secondary_color || '#ff758f',
         backgroundColor: inv.background_color || '#0f0207',
         textColor: inv.text_color || '#ffffff',
         fontFamily: inv.font_family || 'Outfit',
+        configuration: inv.theme_config || null,
       },
       locations,
       foodOptions: foods,

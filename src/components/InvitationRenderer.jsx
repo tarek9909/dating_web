@@ -32,14 +32,49 @@ export default function InvitationRenderer({ data = {}, isPreview = false }) {
 
   // Inject Theme CSS variables dynamically if defined
   useEffect(() => {
-    if (theme?.tokens) {
+    if (theme) {
       const root = document.documentElement;
-      if (theme.tokens.accentColor) root.style.setProperty('--accent-pink', theme.tokens.accentColor);
-      if (theme.tokens.primaryColor) root.style.setProperty('--bg-dark', theme.tokens.primaryColor);
-      if (theme.tokens.goldColor) root.style.setProperty('--gold-accent', theme.tokens.goldColor);
-      if (theme.tokens.fontFamily) root.style.setProperty('--font-main', theme.tokens.fontFamily);
+      const primary = content?.themeAccentColor || content?.theme_accent_color || theme?.tokens?.accentColor || theme?.primaryColor || theme?.primary_color || '#ff4d6d';
+      const secondary = theme?.tokens?.secondaryColor || theme?.secondaryColor || theme?.secondary_color || '#ff758f';
+      const bgDark = theme?.tokens?.primaryColor || theme?.backgroundColor || theme?.background_color || '#0f0207';
+      const textMain = theme?.textColor || theme?.text_color || '#ffffff';
+      const font = theme?.tokens?.fontFamily || theme?.fontFamily || theme?.font_family || 'Outfit';
+
+      root.style.setProperty('--accent-pink', primary);
+      root.style.setProperty('--accent-pink-light', secondary);
+      root.style.setProperty('--bg-dark', bgDark);
+      root.style.setProperty('--text-main', textMain);
+      root.style.setProperty('--font-sans', font);
+
+      let config = theme?.configuration || theme?.tokens || {};
+      if (typeof config === 'string') {
+        try { config = JSON.parse(config); } catch { config = {}; }
+      }
+
+      if (config.wine) root.style.setProperty('--bg-wine', config.wine);
+      if (config.burgundy) root.style.setProperty('--bg-burgundy', config.burgundy);
+      if (config.cardBg) root.style.setProperty('--bg-card', config.cardBg);
+      if (config.borderSubtle) root.style.setProperty('--border-subtle', config.borderSubtle);
+      if (config.borderActive) root.style.setProperty('--border-active', config.borderActive);
+      if (config.glowPink) root.style.setProperty('--glow-pink', config.glowPink);
     }
-  }, [theme]);
+
+    return () => {
+      // Reset variables on leave to prevent bleeding into dashboard
+      const root = document.documentElement;
+      root.style.removeProperty('--accent-pink');
+      root.style.removeProperty('--accent-pink-light');
+      root.style.removeProperty('--bg-dark');
+      root.style.removeProperty('--bg-wine');
+      root.style.removeProperty('--bg-burgundy');
+      root.style.removeProperty('--bg-card');
+      root.style.removeProperty('--border-subtle');
+      root.style.removeProperty('--border-active');
+      root.style.removeProperty('--glow-pink');
+      root.style.removeProperty('--text-main');
+      root.style.removeProperty('--font-sans');
+    };
+  }, [theme, content]);
 
   // Record initial view event for public invitations
   useEffect(() => {

@@ -66,6 +66,7 @@ export const customerService = {
       dressCode: data.dressCode,
       dressCodeText: data.dressCodeText,
       internalTitle: data.internalTitle,
+      themeId: data.themeId,
     });
 
     return customerRepository.getInvitationFull(publicId, customerId);

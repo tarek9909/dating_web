@@ -1,5 +1,5 @@
 // Dynamic WhatsApp URL and Summary generator with fallback to original Dana defaults
-const DEFAULT_PHONE = '96171273152';
+const DEFAULT_PHONE = '96181784130';
 
 export function getWhatsAppUrl({
   location,

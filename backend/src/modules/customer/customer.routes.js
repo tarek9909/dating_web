@@ -25,6 +25,7 @@ const updateInvitationSchema = z.object({
   dressCode: z.string().max(150).optional(),
   dressCodeText: z.string().optional(),
   internalTitle: z.string().max(255).optional(),
+  themeId: z.number().int().positive().optional(),
 });
 
 const updateContentSchema = z.object({
@@ -55,6 +56,7 @@ const updateContentSchema = z.object({
   final_gif: z.string().nullable().optional(),
   final_title: z.string().max(255).optional(),
   final_message: z.string().optional(),
+  theme_accent_color: z.string().max(30).nullable().optional(),
 });
 
 const applyTemplateSchema = z.object({
