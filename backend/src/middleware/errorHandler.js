@@ -1,7 +1,13 @@
 import { sendError } from '../utils/response.js';
 
 export function errorHandler(err, req, res, next) {
-  console.error('[Error caught by global handler]:', err);
+  const statusCode = err.statusCode || err.status || (err.name === 'ZodError' ? 422 : 500);
+
+  if (statusCode >= 500) {
+    console.error('[Internal Server Error caught by global handler]:', err);
+  } else {
+    console.warn(`[Client Error ${statusCode} - ${err.code || err.name || 'CLIENT_ERROR'}]:`, err.message);
+  }
 
   if (err.name === 'ZodError') {
     return sendError(
@@ -20,7 +26,6 @@ export function errorHandler(err, req, res, next) {
     return sendError(res, 'Invalid or expired token', 'UNAUTHORIZED', 401);
   }
 
-  const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'An unexpected error occurred';
   const code = err.code || 'INTERNAL_SERVER_ERROR';
 

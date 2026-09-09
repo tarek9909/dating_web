@@ -18,6 +18,10 @@ export const customerRepository = {
     };
   },
 
+  async getCustomerDashboard(customerId) {
+    return this.getDashboard(customerId);
+  },
+
   async getInvitationsByCustomer(customerId) {
     const [rows] = await pool.execute(
       `SELECT i.*, t.name AS template_name, th.name AS theme_name
@@ -65,7 +69,8 @@ export const customerRepository = {
     const [locations] = await pool.execute(
       `SELECT l.id, 
               COALESCE(il.custom_name, l.name) AS name,
-              l.category,
+              COALESCE(il.custom_tag, l.category) AS tag,
+              COALESCE(il.custom_tag, l.category) AS category,
               COALESCE(il.custom_description, l.description) AS description,
               l.emoji,
               COALESCE(il.custom_image_url, l.image_url) AS image_url,
@@ -84,6 +89,7 @@ export const customerRepository = {
               COALESCE(ifo.custom_name, f.name) AS name,
               COALESCE(ifo.custom_description, f.description) AS description,
               COALESCE(ifo.custom_emoji, f.emoji) AS emoji,
+              COALESCE(ifo.custom_tag, 'Activity') AS tag,
               COALESCE(ifo.custom_image_url, f.image_url) AS image_url,
               COALESCE(ifo.custom_image_url, f.image_url) AS imageUrl,
               ifo.sort_order
@@ -187,7 +193,8 @@ export const customerRepository = {
       'food_title', 'food_subtitle', 'when_title', 'when_subtitle',
       'dress_code_title', 'dress_code_subtitle', 'dress_code_checklist',
       'opening_gif', 'angry_gif', 'when_gif', 'dress_gif', 'final_gif',
-      'final_title', 'final_message', 'theme_accent_color'
+      'final_title', 'final_message', 'theme_accent_color',
+      'picker_start_time', 'picker_end_time'
     ];
 
     allowedKeys.forEach((k) => {
@@ -211,26 +218,46 @@ export const customerRepository = {
   },
 
   async updateCustomLocations(invitationId, locations) {
-    for (const loc of locations) {
+    for (let i = 0; i < locations.length; i++) {
+      const loc = locations[i];
+      const tagVal = loc.custom_tag || loc.tag || null;
+      const imgVal = loc.imageUrl || loc.image_url || null;
       if (loc.id) {
         await pool.execute(
           `UPDATE invitation_locations
-           SET custom_name = ?, custom_description = ?, custom_image_url = ?
+           SET custom_name = ?, custom_tag = ?, custom_description = ?, custom_image_url = ?
            WHERE invitation_id = ? AND location_id = ?`,
-          [loc.name || null, loc.description || null, loc.imageUrl || loc.image_url || null, invitationId, loc.id]
+          [loc.name || null, tagVal, loc.description || null, imgVal, invitationId, loc.id]
+        );
+      } else {
+        await pool.execute(
+          `UPDATE invitation_locations
+           SET custom_name = ?, custom_tag = ?, custom_description = ?, custom_image_url = ?
+           WHERE invitation_id = ? AND sort_order = ?`,
+          [loc.name || null, tagVal, loc.description || null, imgVal, invitationId, i + 1]
         );
       }
     }
   },
 
   async updateCustomOptions(invitationId, options) {
-    for (const opt of options) {
+    for (let i = 0; i < options.length; i++) {
+      const opt = options[i];
+      const tagVal = opt.custom_tag || opt.tag || null;
+      const imgVal = opt.imageUrl || opt.image_url || null;
       if (opt.id) {
         await pool.execute(
           `UPDATE invitation_food_options
-           SET custom_name = ?, custom_description = ?, custom_image_url = ?, custom_emoji = ?
+           SET custom_name = ?, custom_tag = ?, custom_description = ?, custom_image_url = ?, custom_emoji = ?
            WHERE invitation_id = ? AND food_option_id = ?`,
-          [opt.name || null, opt.description || null, opt.imageUrl || opt.image_url || null, opt.emoji || null, invitationId, opt.id]
+          [opt.name || null, tagVal, opt.description || null, imgVal, opt.emoji || null, invitationId, opt.id]
+        );
+      } else {
+        await pool.execute(
+          `UPDATE invitation_food_options
+           SET custom_name = ?, custom_tag = ?, custom_description = ?, custom_image_url = ?, custom_emoji = ?
+           WHERE invitation_id = ? AND sort_order = ?`,
+          [opt.name || null, tagVal, opt.description || null, imgVal, opt.emoji || null, invitationId, i + 1]
         );
       }
     }
@@ -310,6 +337,7 @@ export const customerRepository = {
       noClicks: 0,
       locationSelects: 0,
       foodSelects: 0,
+      dateSelects: 0,
       shares: 0,
       rsvps: 0,
     };
@@ -320,6 +348,7 @@ export const customerRepository = {
       else if (r.event_type === 'no_click') counts.noClicks = r.count;
       else if (r.event_type === 'location_select') counts.locationSelects = r.count;
       else if (r.event_type === 'food_select') counts.foodSelects = r.count;
+      else if (r.event_type === 'date_select') counts.dateSelects = r.count;
       else if (r.event_type === 'share_click') counts.shares = r.count;
       else if (r.event_type === 'rsvp_complete') counts.rsvps = r.count;
     });

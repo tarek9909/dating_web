@@ -97,7 +97,7 @@ export default function ScreenFinal({ selections, onRestart, config = {}, onComp
     <div className="screen-container animate-fade-in">
       <div className="final-celebration-card glass-card">
         <div className="badge-pill celebration-pill">
-          <Heart size={14} fill="#ff4d6d" stroke="#ff4d6d" />
+          <Heart size={14} fill="var(--accent-pink)" stroke="var(--accent-pink)" />
           <span>Official Agreement Signed</span>
         </div>
 

@@ -57,6 +57,8 @@ const updateContentSchema = z.object({
   final_title: z.string().max(255).optional(),
   final_message: z.string().optional(),
   theme_accent_color: z.string().max(30).nullable().optional(),
+  picker_start_time: z.string().max(50).nullable().optional(),
+  picker_end_time: z.string().max(50).nullable().optional(),
 });
 
 const applyTemplateSchema = z.object({

@@ -22,11 +22,15 @@ export default function BackgroundParticles() {
     const numParticles = Math.min(35, Math.floor(window.innerWidth / 15));
     const particles = [];
 
+    const computedStyle = getComputedStyle(document.documentElement);
+    const primaryRgb = computedStyle.getPropertyValue('--primary-rgb').trim() || '255, 77, 109';
+    const secondaryRgb = computedStyle.getPropertyValue('--secondary-rgb').trim() || '255, 117, 143';
+
     const heartColors = [
-      'rgba(255, 77, 109, ',
-      'rgba(255, 117, 143, ',
-      'rgba(255, 143, 163, ',
-      'rgba(255, 195, 207, '
+      `rgba(${primaryRgb}, `,
+      `rgba(${secondaryRgb}, `,
+      `rgba(${primaryRgb}, `,
+      `rgba(${secondaryRgb}, `
     ];
 
     for (let i = 0; i < numParticles; i++) {

@@ -51,19 +51,19 @@ export default function ScreenClaimed({
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          background: 'rgba(255, 77, 109, 0.2)',
-          border: '1px solid #ff4d6d',
+          background: 'var(--badge-bg, rgba(255, 77, 109, 0.2))',
+          border: '1px solid var(--accent-pink, #ff4d6d)',
           borderRadius: '999px',
           padding: '6px 16px',
           fontSize: '12px',
           fontWeight: 700,
           color: '#ffd166',
           marginBottom: '16px',
-          boxShadow: '0 0 15px rgba(255, 77, 109, 0.4)'
+          boxShadow: 'var(--glow-pink, 0 0 15px rgba(255, 77, 109, 0.4))'
         }}>
           <Sparkles size={14} />
           <span>Official Date Agreement Sealed</span>
-          <Heart size={14} fill="#ff4d6d" stroke="#ff4d6d" />
+          <Heart size={14} fill="var(--accent-pink)" stroke="var(--accent-pink)" />
         </div>
 
         {/* Hero GIF */}
@@ -73,7 +73,7 @@ export default function ScreenClaimed({
           margin: '0 auto 18px',
           borderRadius: '20px',
           overflow: 'hidden',
-          border: '2px solid rgba(255, 77, 109, 0.4)',
+          border: '2px solid var(--border-active, rgba(255, 77, 109, 0.4))',
           boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
         }}>
           <img
@@ -95,7 +95,7 @@ export default function ScreenClaimed({
           marginBottom: '8px',
           textShadow: '0 2px 10px rgba(0,0,0,0.5)'
         }}>
-          {recipientName} Already Said YES! <span style={{ color: '#ff4d6d' }}>❤️</span>
+          {recipientName} Already Said YES! <span style={{ color: 'var(--accent-pink)' }}>❤️</span>
         </h1>
 
         <p style={{

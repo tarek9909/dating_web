@@ -9,6 +9,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import GifPickerModal from '../components/GifPickerModal';
+import ActivityPickerModal from '../components/ActivityPickerModal';
+import { generateHoursRange } from '../components/ScreenWhen';
 import { sound } from '../utils/sound';
 import gsap from 'gsap';
 
@@ -45,6 +47,8 @@ export default function CustomerDashboard() {
     mode: 'strict',
     text: 'Tomorrow',
     time: '6:00 PM',
+    startTime: '6:00 PM',
+    endTime: '11:00 PM',
   });
   const [dressConfig, setDressConfig] = useState({
     value: 'Casual',
@@ -70,6 +74,15 @@ export default function CustomerDashboard() {
     targetIndex: null,
     targetField: '',
     currentUrl: '',
+  });
+
+  // Activity Picker Modal state
+  const [activityPicker, setActivityPicker] = useState({
+    open: false,
+    title: '',
+    targetType: '', // 'location' | 'option'
+    targetIndex: 0,
+    slotLabel: '',
   });
 
   const [stats, setStats] = useState({ views: 0, yesClicks: 0, noClicks: 0, rsvpShares: 0 });
@@ -174,10 +187,21 @@ export default function CustomerDashboard() {
   ];
 
   const OPTION_PRESETS = [
-    { name: 'Neapolitan Woodfired Pizza', emoji: '🍕', description: 'Crispy crust, melted burrata, w cozy Italian date ambiance.', imageUrl: '/gifs/food_pizza.gif' },
-    { name: 'Authentic Lebanese Mashawi & Mezze', emoji: '🥩', description: 'Tabbouleh, hummus, taouk fresh, w mezza lebneniyeh 3al osoul.', imageUrl: '/gifs/food_lebanese.gif' },
-    { name: 'Crepes & Artisan Gelato Run', emoji: '🍦', description: 'Nutella loaded crepes w pistachio gelato 3al mashye.', imageUrl: '/gifs/food_crepes.gif' },
-    { name: 'Smash Burgers & Truffle Fries', emoji: '🍔', description: 'Juicy double patty, brioche bun, w dirty fries.', imageUrl: '/gifs/food_burger.gif' },
+    { name: 'Neapolitan Woodfired Pizza', emoji: '🍕', tag: 'Italian Craving 🍕', description: 'Crispy crust, melted burrata, w cozy Italian date ambiance.', imageUrl: '/gifs/food_italian.gif' },
+    { name: 'Authentic Lebanese Mashawi & Mezze', emoji: '🥩', tag: 'Elite Feast 🇱🇧', description: 'Tabbouleh, hummus, taouk fresh, w mezza lebneniyeh 3al osoul.', imageUrl: '/gifs/food_lebanese.gif' },
+    { name: 'Crepes & Artisan Gelato Run', emoji: '🍦', tag: 'Sweet Tooth 🍦', description: 'Nutella loaded crepes w pistachio gelato 3al mashye.', imageUrl: '/gifs/food_sandwiches.gif' },
+    { name: 'Smash Burgers & Truffle Fries', emoji: '🍔', tag: 'Comfort Food 🍔', description: 'Juicy double patty, brioche bun, w dirty fries.', imageUrl: '/gifs/food_sandwiches.gif' },
+  ];
+
+  const ACTIVITY_PRESETS = [
+    { name: 'Retro Arcade & VR Battles', tag: 'Gaming & Laughs 🕹️', emoji: '🕹️', description: 'Neon retro arcade, air hockey, Mario Kart battle w VR simulation.', imageUrl: '/gifs/loc_hawana.gif' },
+    { name: 'Cosmic Glow Bowling', tag: 'Friendly Competition 🎳', emoji: '🎳', description: 'Glow-in-the-dark strikes, pool tables, cocktails w competitive laughs.', imageUrl: '/gifs/loc_hawana.gif' },
+    { name: 'Clay Pottery Wheel Workshop', tag: 'Creative & Hands-On 🏺', emoji: '🏺', description: 'Sculpting clay mugs and vases together 3al daw l hawa2i with private instructor.', imageUrl: '/gifs/loc_skymate.gif' },
+    { name: 'Canvas Paint & Sip Wine Night', tag: 'Art & Wine 🎨', emoji: '🎨', description: 'Painting matching canvases, red wine glasses w cozy acoustic lo-fi vibes.', imageUrl: '/gifs/loc_skymate.gif' },
+    { name: 'Go-Kart Racing Grand Prix', tag: 'Adrenaline & Speed 🏎️', emoji: '🏎️', description: 'High-speed indoor circuit racing, overtaking maneuvers w winner podium photo.', imageUrl: '/gifs/loc_hawana.gif' },
+    { name: 'Sunset Batroun Sea Kayaking', tag: 'Coastline Adventure 🌊', emoji: '🚣', description: 'Paddleboarding along Batroun ancient sea walls at golden hour.', imageUrl: '/gifs/loc_jia.gif' },
+    { name: 'Rooftop Open-Air Cinema', tag: 'Under The Stars 🍿', emoji: '🍿', description: 'Plush beanbags under the stars, warm fleece blankets w gourmet popcorn.', imageUrl: '/gifs/loc_skymate.gif' },
+    { name: 'Mystery Detective Escape Room', tag: 'Puzzle Adventure 🧩', emoji: '🧩', description: 'Solving secret detective clues together against a ticking 60-minute countdown.', imageUrl: '/gifs/loc_hawana.gif' },
   ];
 
   const handleApplyVenuePreset = (preset, index) => {
@@ -196,10 +220,96 @@ export default function CustomerDashboard() {
       ...opt,
       name: preset.name,
       emoji: preset.emoji,
+      tag: preset.tag || opt.tag,
       description: preset.description,
       imageUrl: preset.imageUrl || opt.imageUrl
     } : opt));
     sound.playPop();
+  };
+
+  const handleApplyActivityPresetToLocation = (preset, index) => {
+    setLocations(prev => prev.map((loc, i) => i === index ? {
+      ...loc,
+      name: preset.name,
+      tag: preset.tag,
+      description: preset.description,
+      imageUrl: preset.imageUrl || loc.imageUrl
+    } : loc));
+    sound.playPop();
+  };
+
+  const handleApplyActivityPresetToOption = (preset, index) => {
+    setOptions(prev => prev.map((opt, i) => i === index ? {
+      ...opt,
+      name: preset.name,
+      emoji: preset.emoji || '🎯',
+      tag: preset.tag,
+      description: preset.description,
+      imageUrl: preset.imageUrl || opt.imageUrl
+    } : opt));
+    setContent(prev => ({
+      ...prev,
+      categoryType: prev.categoryType === 'food' ? 'activity' : prev.categoryType,
+      sectionTitles: {
+        ...prev.sectionTitles,
+        food: prev.sectionTitles.food === 'Sho 3abalna nekol? 🍕' || !prev.sectionTitles.food ? 'Sho badna na3mel? 🎯' : prev.sectionTitles.food,
+      },
+      subtitles: {
+        ...prev.subtitles,
+        food: prev.subtitles.food === 'Food speaks louder than words. Pick your craving:' || !prev.subtitles.food ? 'Pick the activity you are most excited for:' : prev.subtitles.food,
+      }
+    }));
+    sound.playPop();
+  };
+
+  const handleOpenActivityPicker = (targetType, targetIndex = 0, slotLabel = '') => {
+    const defaultLabel = targetType === 'location'
+      ? `Screen 2 • Card #${targetIndex + 1}`
+      : `Screen 3 • Card #${targetIndex + 1}`;
+    const defaultTitle = targetType === 'location'
+      ? 'Ekhtar Nashat Khass L Mar7aleh 2 • Screen 2 Custom Activity'
+      : 'Ekhtar Nashat Khass L Mar7aleh 3 • Screen 3 Custom Activity';
+    setActivityPicker({
+      open: true,
+      title: defaultTitle,
+      targetType,
+      targetIndex,
+      slotLabel: slotLabel || defaultLabel,
+    });
+  };
+
+  const handleActivitySelected = (activity, slotIndex = null) => {
+    const targetIdx = typeof slotIndex === 'number' ? slotIndex : activityPicker.targetIndex;
+    if (activityPicker.targetType === 'location') {
+      setLocations(prev => prev.map((loc, idx) => idx === targetIdx ? {
+        ...loc,
+        name: activity.name,
+        tag: activity.tag || 'Custom Activity 🎯',
+        description: activity.description,
+        imageUrl: activity.imageUrl || loc.imageUrl,
+      } : loc));
+    } else if (activityPicker.targetType === 'option') {
+      setOptions(prev => prev.map((opt, idx) => idx === targetIdx ? {
+        ...opt,
+        name: activity.name,
+        emoji: activity.emoji || '🎯',
+        tag: activity.tag || 'Custom Activity 🎯',
+        description: activity.description,
+        imageUrl: activity.imageUrl || opt.imageUrl,
+      } : opt));
+      setContent(prev => ({
+        ...prev,
+        categoryType: prev.categoryType === 'food' ? 'activity' : prev.categoryType,
+        sectionTitles: {
+          ...prev.sectionTitles,
+          food: prev.sectionTitles.food === 'Sho 3abalna nekol? 🍕' || !prev.sectionTitles.food ? 'Sho badna na3mel? 🎯' : prev.sectionTitles.food,
+        },
+        subtitles: {
+          ...prev.subtitles,
+          food: prev.subtitles.food === 'Food speaks louder than words. Pick your craving:' || !prev.subtitles.food ? 'Pick the activity you are most excited for:' : prev.subtitles.food,
+        }
+      }));
+    }
   };
 
   useEffect(() => {
@@ -303,7 +413,9 @@ export default function CustomerDashboard() {
         setScheduleConfig({
           mode: invData.invitation.schedule_mode || 'strict',
           text: invData.invitation.date_text || 'Tomorrow',
-          time: invData.invitation.time_value ? String(invData.invitation.time_value).slice(0, 5) : '6:00 PM'
+          time: invData.invitation.time_value ? String(invData.invitation.time_value).slice(0, 5) : '6:00 PM',
+          startTime: invData.content?.picker_start_time || '6:00 PM',
+          endTime: invData.content?.picker_end_time || '11:00 PM',
         });
         if (invData.theme?.id) {
           setSelectedThemeId(Number(invData.theme.id));
@@ -446,6 +558,8 @@ export default function CustomerDashboard() {
           final_title: content.final.title,
           final_message: content.final.message,
           theme_accent_color: customAccentColor || null,
+          picker_start_time: scheduleConfig.startTime || '6:00 PM',
+          picker_end_time: scheduleConfig.endTime || '11:00 PM',
         }),
 
         // 2. Update invitation schedule & dress code & theme
@@ -1017,11 +1131,22 @@ export default function CustomerDashboard() {
               </span>
             </div>
 
-            {/* Quick Inspiration Chips */}
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50/40 border border-rose-200/70">
-              <span className="block text-xs font-bold text-on-surface mb-2.5">
-                Afkar Lebneniyeh Sari3a • Quick Lebanese Venue Presets (Kbosi la t3abbi):
-              </span>
+            {/* Quick Inspiration Chips & Custom Activity Hub */}
+            <div className="mb-6 p-4.5 rounded-2xl bg-rose-50/40 border border-rose-200/70 flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="block text-xs font-bold text-on-surface">
+                  Afkar Lebneniyeh Sari3a • Quick Lebanese Venue Presets (Kbosi la t3abbi):
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenActivityPicker('location', 0, `Card #1 (${locations[0]?.name || 'Slot 1'})`)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-primary to-rose-600 text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer w-fit"
+                >
+                  <Compass size={13} />
+                  <span>🎯 Ekhtar Nashat Khass • Choose Custom Activity</span>
+                </button>
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 {VENUE_PRESETS.map((preset, pIdx) => (
                   <button
@@ -1034,6 +1159,26 @@ export default function CustomerDashboard() {
                     <span className="font-bold text-primary">{preset.name}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Quick Activity Presets for Screen 2 */}
+              <div className="pt-2.5 border-t border-rose-100">
+                <span className="block text-[11px] font-bold text-on-surface-variant mb-2">
+                  🎯 Afkar Anshita Tafa3oliyeh • Interactive Date Activities (Kbosi la t3abbi):
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {ACTIVITY_PRESETS.map((preset, pIdx) => (
+                    <button
+                      key={pIdx}
+                      type="button"
+                      onClick={() => handleApplyActivityPresetToLocation(preset, pIdx % locations.length)}
+                      className="px-2.5 py-1 rounded-xl bg-white/90 border border-rose-200 hover:border-primary hover:bg-rose-50 text-[11px] font-semibold text-on-surface flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                    >
+                      <span>{preset.emoji}</span>
+                      <span className="font-bold text-rose-700">{preset.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1068,20 +1213,31 @@ export default function CustomerDashboard() {
                   key={loc.id || idx}
                   className="p-4 sm:p-5 rounded-2xl bg-rose-50/35 border border-rose-200/80 flex flex-col sm:flex-row items-center gap-4 shadow-sm"
                 >
-                  <div className="flex flex-col items-center shrink-0">
+                  <div className="flex flex-col items-center shrink-0 w-28">
                     <img
                       src={loc.imageUrl}
                       alt={loc.name}
                       className="w-20 h-20 object-cover rounded-xl border border-rose-200 shadow-sm"
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleOpenGifPicker('location', idx, 'imageUrl', `Select GIF for ${loc.name}`, loc.imageUrl)}
-                      className="mt-2 text-[11px] font-bold text-primary hover:text-rose-700 flex items-center gap-1 cursor-pointer"
-                    >
-                      <ImageIcon size={12} />
-                      <span>Ghayyir L GIF • Change</span>
-                    </button>
+                    <div className="flex flex-col gap-1 w-full mt-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenActivityPicker('location', idx, `Card #${idx + 1} (${loc.name || 'Venue'})`)}
+                        className="w-full py-1 px-2 rounded-lg bg-rose-50 border border-rose-200 hover:border-primary hover:bg-rose-100 text-[11px] font-bold text-primary flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        title="Ekhtar nashat curated aw 3abbi custom activity"
+                      >
+                        <Compass size={12} />
+                        <span>🎯 Nashat Khass</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGifPicker('location', idx, 'imageUrl', `Select GIF for ${loc.name}`, loc.imageUrl)}
+                        className="w-full py-0.5 text-[10px] font-semibold text-on-surface-variant hover:text-primary flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <ImageIcon size={11} />
+                        <span>Ghayyir L GIF</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
@@ -1177,11 +1333,22 @@ export default function CustomerDashboard() {
               </div>
             </div>
 
-            {/* Quick Inspiration Chips */}
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50/40 border border-rose-200/70">
-              <span className="block text-xs font-bold text-on-surface mb-2.5">
-                Afkar Akel Sari3a • Quick Dining Presets (Kbosi la t3abbi):
-              </span>
+            {/* Quick Inspiration Chips & Custom Activity Hub */}
+            <div className="mb-6 p-4.5 rounded-2xl bg-rose-50/40 border border-rose-200/70 flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="block text-xs font-bold text-on-surface">
+                  Afkar Akel Sari3a • Quick Dining Presets (Kbosi la t3abbi):
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenActivityPicker('option', 0, `Card #${1} (${options[0]?.name || 'Option 1'})`)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-primary to-rose-600 text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer w-fit"
+                >
+                  <Compass size={13} />
+                  <span>🎯 Ekhtar Nashat Khass • Choose Custom Activity</span>
+                </button>
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 {OPTION_PRESETS.map((preset, pIdx) => (
                   <button
@@ -1194,6 +1361,26 @@ export default function CustomerDashboard() {
                     <span className="font-bold text-primary">{preset.name}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Quick Activity Presets for Screen 3 */}
+              <div className="pt-2.5 border-t border-rose-100">
+                <span className="block text-[11px] font-bold text-on-surface-variant mb-2">
+                  🎯 Afkar Anshita Tafa3oliyeh • Interactive Date Activities (Kbosi la t3abbi):
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {ACTIVITY_PRESETS.map((preset, pIdx) => (
+                    <button
+                      key={pIdx}
+                      type="button"
+                      onClick={() => handleApplyActivityPresetToOption(preset, pIdx % options.length)}
+                      className="px-2.5 py-1 rounded-xl bg-white/90 border border-rose-200 hover:border-primary hover:bg-rose-50 text-[11px] font-semibold text-on-surface flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                    >
+                      <span>{preset.emoji}</span>
+                      <span className="font-bold text-rose-700">{preset.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1228,20 +1415,31 @@ export default function CustomerDashboard() {
                   key={opt.id || idx}
                   className="p-4 sm:p-5 rounded-2xl bg-rose-50/35 border border-rose-200/80 flex flex-col sm:flex-row items-center gap-4 shadow-sm"
                 >
-                  <div className="flex flex-col items-center shrink-0">
+                  <div className="flex flex-col items-center shrink-0 w-28">
                     <img
                       src={opt.imageUrl}
                       alt={opt.name}
                       className="w-20 h-20 object-cover rounded-xl border border-rose-200 shadow-sm"
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleOpenGifPicker('option', idx, 'imageUrl', `Select GIF for ${opt.name}`, opt.imageUrl)}
-                      className="mt-2 text-[11px] font-bold text-primary hover:text-rose-700 flex items-center gap-1 cursor-pointer"
-                    >
-                      <ImageIcon size={12} />
-                      <span>Ghayyir L GIF • Change</span>
-                    </button>
+                    <div className="flex flex-col gap-1 w-full mt-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenActivityPicker('option', idx, `Card #${idx + 1} (${opt.name || 'Option'})`)}
+                        className="w-full py-1 px-2 rounded-lg bg-rose-50 border border-rose-200 hover:border-primary hover:bg-rose-100 text-[11px] font-bold text-primary flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        title="Ekhtar nashat curated aw 3abbi custom activity"
+                      >
+                        <Compass size={12} />
+                        <span>🎯 Nashat Khass</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGifPicker('option', idx, 'imageUrl', `Select GIF for ${opt.name}`, opt.imageUrl)}
+                        className="w-full py-0.5 text-[10px] font-semibold text-on-surface-variant hover:text-primary flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <ImageIcon size={11} />
+                        <span>Ghayyir L GIF</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
@@ -1342,7 +1540,7 @@ export default function CustomerDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-1.5">
-                  {scheduleConfig.mode === 'strict' ? 'Nass L Maw3ed (e.g. Bokra L Jom3a / This Friday)' : 'L Yom L Moqtara7'}
+                  {scheduleConfig.mode === 'strict' ? 'Nass L Maw3ed (e.g. Bokra L Jom3a / This Friday)' : 'L Yom L Moqtara7 • Default Suggested Day'}
                 </label>
                 <input
                   type="text"
@@ -1354,7 +1552,7 @@ export default function CustomerDashboard() {
 
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-1.5">
-                  L Wa2et L Moqtara7 (e.g. 7:30 PM)
+                  {scheduleConfig.mode === 'strict' ? 'L Wa2et L Moqtara7 • Locked Time (e.g. 7:30 PM)' : 'L Wa2et L Mabda2i • Default Pre-selected Time'}
                 </label>
                 <input
                   type="text"
@@ -1364,6 +1562,107 @@ export default function CustomerDashboard() {
                 />
               </div>
             </div>
+
+            {/* Configurable Hours Window for Picker Mode */}
+            {scheduleConfig.mode === 'picker' && (
+              <div className="mb-6 p-5 rounded-2xl bg-rose-50/50 border border-rose-200/90 flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <span className="block text-xs font-bold text-on-surface">
+                      ⏰ Majal Sa3at L Maw3ed • Date Hours Window (Start & End Time)
+                    </span>
+                    <span className="text-[11px] text-on-surface-variant">
+                      7added awwal se3a w e5ir se3a bte2dar l sha5siye l teniyeh tna22i bayneton
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-rose-100 text-primary text-[11px] font-bold w-fit">
+                    {scheduleConfig.startTime || '6:00 PM'} ➔ {scheduleConfig.endTime || '11:00 PM'}
+                  </span>
+                </div>
+
+                {/* Quick Window Presets */}
+                <div>
+                  <span className="block text-[11px] font-bold text-on-surface-variant mb-2">
+                    Quick Lebanese Hour Presets (Kbosi la t3abbi):
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: '☀️ Ba3d L Doher • Afternoon', start: '1:00 PM', end: '5:00 PM' },
+                      { label: '🌅 Ghroub Batroun • Sunset', start: '5:00 PM', end: '8:30 PM' },
+                      { label: '🌙 3asha w Sahra • Evening', start: '7:00 PM', end: '11:30 PM' },
+                      { label: '🍸 Sahra Layliye • Late Night', start: '9:00 PM', end: '2:00 AM' },
+                    ].map((preset, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => {
+                          setScheduleConfig(prev => ({ ...prev, startTime: preset.start, endTime: preset.end }));
+                          sound.playPop();
+                        }}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
+                          scheduleConfig.startTime === preset.start && scheduleConfig.endTime === preset.end
+                            ? 'bg-primary text-white border-primary shadow-xs'
+                            : 'bg-white border-rose-200 text-on-surface hover:border-primary hover:bg-rose-50'
+                        }`}
+                      >
+                        <span>{preset.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Start and End Hour Inputs */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-on-surface-variant mb-1">
+                      Se3at L Bidayeh • Start Time (Earliest Hour)
+                    </label>
+                    <input
+                      type="text"
+                      value={scheduleConfig.startTime || '6:00 PM'}
+                      onChange={(e) => setScheduleConfig(prev => ({ ...prev, startTime: e.target.value }))}
+                      placeholder="e.g. 5:00 PM or 17:00"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-rose-200 text-xs font-bold text-on-surface outline-none focus:border-primary shadow-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-on-surface-variant mb-1">
+                      Se3at L Nehyeh • End Time (Latest Hour)
+                    </label>
+                    <input
+                      type="text"
+                      value={scheduleConfig.endTime || '11:00 PM'}
+                      onChange={(e) => setScheduleConfig(prev => ({ ...prev, endTime: e.target.value }))}
+                      placeholder="e.g. 11:00 PM or 23:00"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-rose-200 text-xs font-bold text-on-surface outline-none focus:border-primary shadow-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Live Preview of Generated Recipient Hour Slots */}
+                <div className="pt-2 border-t border-rose-200/70">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-on-surface-variant">
+                      Krouteh L Se3at Li Ra7 Yshoufa L Taraf L Teneh (Live Preview):
+                    </span>
+                    <span className="text-[10px] text-primary font-bold">
+                      {generateHoursRange(scheduleConfig.startTime, scheduleConfig.endTime, 30).length} Slots (Every 30m)
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1">
+                    {generateHoursRange(scheduleConfig.startTime, scheduleConfig.endTime, 30).map((slot, sIdx) => (
+                      <span
+                        key={sIdx}
+                        className="px-2.5 py-1 rounded-full bg-white border border-rose-200 text-[11px] font-semibold text-on-surface shadow-2xs"
+                      >
+                        {slot}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Visual Media Slot for Schedule */}
             <div className="p-4 rounded-2xl bg-white border border-rose-200/80 mb-6 shadow-xs flex items-center gap-4">
@@ -1645,6 +1944,7 @@ export default function CustomerDashboard() {
                       key={th.id}
                       onClick={() => {
                         setSelectedThemeId(th.id);
+                        setCustomAccentColor('');
                         sound.playPop();
                       }}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between gap-3 shadow-xs ${
@@ -1859,6 +2159,21 @@ export default function CustomerDashboard() {
         currentGifUrl={gifPicker.currentUrl}
         onClose={() => setGifPicker(prev => ({ ...prev, open: false }))}
         onSelect={handleGifSelected}
+      />
+
+      {/* Activity Library & Custom Activity Picker Modal */}
+      <ActivityPickerModal
+        isOpen={activityPicker.open}
+        title={activityPicker.title}
+        slotLabel={activityPicker.slotLabel}
+        initialSlotIndex={activityPicker.targetIndex}
+        slotOptions={
+          activityPicker.targetType === 'location'
+            ? locations.map((loc, i) => ({ index: i, label: `Card #${i + 1} (${loc.name || 'Venue ' + (i + 1)})` }))
+            : options.map((opt, i) => ({ index: i, label: `Card #${i + 1} (${opt.name || 'Option ' + (i + 1)})` }))
+        }
+        onClose={() => setActivityPicker(prev => ({ ...prev, open: false }))}
+        onSelectActivity={handleActivitySelected}
       />
     </div>
   );

@@ -38,6 +38,7 @@ export default function AdminPortal() {
     phone: '',
     recipientName: '',
     customPassword: '',
+    error: '',
     submitting: false,
   });
 
@@ -128,6 +129,7 @@ export default function AdminPortal() {
       phone: '',
       recipientName: '',
       customPassword: '',
+      error: '',
       submitting: false,
     });
   };
@@ -135,7 +137,7 @@ export default function AdminPortal() {
   const handleCreateCustomer = async (e) => {
     e.preventDefault();
     try {
-      setCreateModal((prev) => ({ ...prev, submitting: true }));
+      setCreateModal((prev) => ({ ...prev, submitting: true, error: '' }));
       const payload = {
         fullName: createModal.fullName.trim(),
         email: createModal.email.trim(),
@@ -147,7 +149,7 @@ export default function AdminPortal() {
       }
 
       const res = await api.admin.createCustomer(payload);
-      setCreateModal((prev) => ({ ...prev, open: false, submitting: false }));
+      setCreateModal((prev) => ({ ...prev, open: false, submitting: false, error: '' }));
 
       setActivationResult({
         ...res.data,
@@ -159,8 +161,9 @@ export default function AdminPortal() {
       setFeedback({ type: 'success', message: `Customer "${payload.fullName}" added and activated successfully!` });
       loadData();
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to create customer' });
-      setCreateModal((prev) => ({ ...prev, submitting: false }));
+      const errMsg = err.message || 'Failed to create customer';
+      setFeedback({ type: 'error', message: errMsg });
+      setCreateModal((prev) => ({ ...prev, submitting: false, error: errMsg }));
     }
   };
 
@@ -603,6 +606,20 @@ export default function AdminPortal() {
             </p>
 
             <form onSubmit={handleCreateCustomer}>
+              {createModal.error && (
+                <div style={{
+                  padding: '10px 14px',
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  borderRadius: '10px',
+                  color: '#fca5a5',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  marginBottom: '16px'
+                }}>
+                  ⚠️ {createModal.error}
+                </div>
+              )}
               <div style={{ marginBottom: '14px' }}>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#ffc2d1', marginBottom: '4px' }}>
                   Customer Full Name *

@@ -29,7 +29,7 @@ function assertInvitationNotClaimed(invitation) {
 
 export const customerService = {
   async getDashboard(customerId) {
-    return customerRepository.getCustomerDashboard(customerId);
+    return customerRepository.getDashboard(customerId);
   },
 
   async getInvitations(customerId) {

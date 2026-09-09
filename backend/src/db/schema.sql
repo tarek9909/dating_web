@@ -258,6 +258,9 @@ CREATE TABLE IF NOT EXISTS invitation_content (
     final_gif VARCHAR(500) NULL,
     final_title VARCHAR(255) NULL,
     final_message TEXT NULL,
+    picker_start_time VARCHAR(50) NULL,
+    picker_end_time VARCHAR(50) NULL,
+    theme_accent_color VARCHAR(30) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -394,7 +397,7 @@ CREATE TABLE IF NOT EXISTS invitation_media (
 CREATE TABLE IF NOT EXISTS invitation_events (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     invitation_id BIGINT UNSIGNED NOT NULL,
-    event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'share_click', 'rsvp_complete') NOT NULL,
+    event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete') NOT NULL,
     session_key VARCHAR(100) NULL,
     ip_hash CHAR(64) NULL,
     user_agent VARCHAR(500) NULL,

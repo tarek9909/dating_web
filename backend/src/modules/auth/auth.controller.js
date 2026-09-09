@@ -11,11 +11,13 @@ export const authController = {
 
       const result = await authService.login({ email, password, userAgent, ipAddress });
 
+      const isHttps = Boolean(req.secure || req.headers['x-forwarded-proto'] === 'https');
+
       // Set secure HTTP-only refresh cookie
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
-        secure: config.env === 'production',
-        sameSite: config.env === 'production' ? 'strict' : 'lax',
+        secure: isHttps,
+        sameSite: 'lax',
         maxAge: config.jwt.refreshTokenDays * 24 * 60 * 60 * 1000,
         path: '/api/v1/auth',
       });
@@ -23,6 +25,7 @@ export const authController = {
       return sendSuccess(res, {
         user: result.user,
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       });
     } catch (err) {
       next(err);
@@ -31,33 +34,44 @@ export const authController = {
 
   async refresh(req, res, next) {
     try {
-      const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+      if (!refreshToken) {
+        return sendError(res, 'Refresh token is required', 'UNAUTHORIZED', 401);
+      }
+
       const userAgent = req.headers['user-agent'];
       const ipAddress = req.ip || req.connection.remoteAddress;
 
       const result = await authService.refresh({ refreshToken, userAgent, ipAddress });
 
+      const isHttps = Boolean(req.secure || req.headers['x-forwarded-proto'] === 'https');
+
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
-        secure: config.env === 'production',
-        sameSite: config.env === 'production' ? 'strict' : 'lax',
+        secure: isHttps,
+        sameSite: 'lax',
         maxAge: config.jwt.refreshTokenDays * 24 * 60 * 60 * 1000,
         path: '/api/v1/auth',
       });
 
-
       return sendSuccess(res, {
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       });
     } catch (err) {
+      if (err.statusCode === 401 || err.code === 'UNAUTHORIZED' || err.code === 'INVALID_SESSION') {
+        return sendError(res, err.message, err.code || 'UNAUTHORIZED', 401);
+      }
       next(err);
     }
   },
 
   async logout(req, res, next) {
     try {
-      const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-      await authService.logout(refreshToken);
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+      if (refreshToken) {
+        await authService.logout(refreshToken);
+      }
 
       res.clearCookie('refreshToken', { path: '/api/v1/auth' });
       return sendSuccess(res, { message: 'Logged out successfully' });

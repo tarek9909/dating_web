@@ -5,6 +5,7 @@ export const publicRequestLimiter = rateLimit({
   max: 5, // 5 submissions per IP
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     success: false,
     error: {
@@ -19,6 +20,7 @@ export const loginLimiter = rateLimit({
   max: 10, // 10 login attempts per IP
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     success: false,
     error: {
@@ -33,6 +35,7 @@ export const passwordResetLimiter = rateLimit({
   max: 3, // 3 attempts per IP
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     success: false,
     error: {

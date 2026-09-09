@@ -19,6 +19,9 @@
   --accent-gold: #ffb703;
   --accent-green: #25d366; /* WhatsApp Green */
 
+  --primary-rgb: 255, 77, 109;
+  --secondary-rgb: 255, 117, 143;
+
   --text-main: #ffffff;
   --text-secondary: #fcd5ce;
   --text-muted: rgba(255, 240, 243, 0.65);
@@ -106,11 +109,11 @@ button:focus-visible {
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(255, 77, 109, 0.4), 0 0 30px rgba(255, 77, 109, 0.2);
+    box-shadow: 0 0 15px rgba(var(--primary-rgb, 255, 77, 109), 0.4), 0 0 30px rgba(var(--primary-rgb, 255, 77, 109), 0.2);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 77, 109, 0.7), 0 0 45px rgba(255, 77, 109, 0.35);
+    box-shadow: 0 0 25px rgba(var(--primary-rgb, 255, 77, 109), 0.7), 0 0 45px rgba(var(--primary-rgb, 255, 77, 109), 0.35);
     transform: scale(1.025);
   }
 }

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiRequest, setAccessToken, getAccessToken } from '../api/client';
+import { apiRequest, setAccessToken, getAccessToken, setRefreshToken } from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -20,10 +20,12 @@ export function AuthProvider({ children }) {
       } else {
         setUser(null);
         setAccessToken(null);
+        setRefreshToken(null);
       }
     } catch {
       setUser(null);
       setAccessToken(null);
+      setRefreshToken(null);
     } finally {
       setLoading(false);
     }
@@ -41,6 +43,9 @@ export function AuthProvider({ children }) {
 
     if (res.success && res.data) {
       setAccessToken(res.data.accessToken);
+      if (res.data.refreshToken) {
+        setRefreshToken(res.data.refreshToken);
+      }
       setUser(res.data.user);
       return res.data.user;
     }
@@ -54,6 +59,7 @@ export function AuthProvider({ children }) {
       // Ignore network errors on logout
     } finally {
       setAccessToken(null);
+      setRefreshToken(null);
       setUser(null);
     }
   };

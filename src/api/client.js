@@ -4,6 +4,7 @@
  */
 
 let accessToken = localStorage.getItem('access_token') || null;
+let refreshToken = localStorage.getItem('refresh_token') || null;
 
 export function setAccessToken(token) {
   accessToken = token;
@@ -14,8 +15,21 @@ export function setAccessToken(token) {
   }
 }
 
+export function setRefreshToken(token) {
+  refreshToken = token;
+  if (token) {
+    localStorage.setItem('refresh_token', token);
+  } else {
+    localStorage.removeItem('refresh_token');
+  }
+}
+
 export function getAccessToken() {
   return accessToken;
+}
+
+export function getRefreshToken() {
+  return refreshToken;
 }
 
 export async function apiRequest(endpoint, options = {}) {
@@ -48,31 +62,40 @@ export async function apiRequest(endpoint, options = {}) {
 
   // Handle 401 Unauthorized by attempting a token refresh
   if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/refresh')) {
-    try {
-      const refreshRes = await fetch('/api/v1/auth/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
+    // Only attempt refresh if we previously had an active session token
+    if (accessToken || refreshToken) {
+      try {
+        const refreshRes = await fetch('/api/v1/auth/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ refreshToken: refreshToken || undefined }),
+        });
 
-      if (refreshRes.ok) {
-        const refreshData = await refreshRes.json();
-        if (refreshData.success && refreshData.data?.accessToken) {
-          setAccessToken(refreshData.data.accessToken);
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          if (refreshData.success && refreshData.data?.accessToken) {
+            setAccessToken(refreshData.data.accessToken);
+            if (refreshData.data.refreshToken) {
+              setRefreshToken(refreshData.data.refreshToken);
+            }
 
-          // Retry original request with new access token
-          headers.Authorization = `Bearer ${refreshData.data.accessToken}`;
-          response = await fetch(url, {
-            ...options,
-            headers,
-            credentials: 'include',
-          });
+            // Retry original request with new access token
+            headers.Authorization = `Bearer ${refreshData.data.accessToken}`;
+            response = await fetch(url, {
+              ...options,
+              headers,
+              credentials: 'include',
+            });
+          }
+        } else {
+          setAccessToken(null);
+          setRefreshToken(null);
         }
-      } else {
+      } catch {
         setAccessToken(null);
+        setRefreshToken(null);
       }
-    } catch {
-      setAccessToken(null);
     }
   }
 

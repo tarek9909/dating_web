@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 
 export const app = express();
 
+// Trust reverse proxy (e.g. Nginx, PM2, Cloudflare) for accurate client IP and secure cookies
+app.set('trust proxy', 1);
+
 // Security Middlewares
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },

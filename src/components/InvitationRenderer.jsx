@@ -30,49 +30,89 @@ export default function InvitationRenderer({ data = {}, isPreview = false }) {
     dressCode: invitation.dressCode?.value || 'Casual'
   });
 
-  // Inject Theme CSS variables dynamically if defined
-  useEffect(() => {
-    if (theme) {
-      const root = document.documentElement;
-      const primary = content?.themeAccentColor || content?.theme_accent_color || theme?.tokens?.accentColor || theme?.primaryColor || theme?.primary_color || '#ff4d6d';
-      const secondary = theme?.tokens?.secondaryColor || theme?.secondaryColor || theme?.secondary_color || '#ff758f';
-      const bgDark = theme?.tokens?.primaryColor || theme?.backgroundColor || theme?.background_color || '#0f0207';
-      const textMain = theme?.textColor || theme?.text_color || '#ffffff';
-      const font = theme?.tokens?.fontFamily || theme?.fontFamily || theme?.font_family || 'Outfit';
+  // Helper to convert hex to RGB channels for rgba() usage
+  const hexToRgb = (hex) => {
+    if (!hex) return null;
+    let c = String(hex).replace('#', '').trim();
+    if (c.length === 3) {
+      c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    }
+    if (c.length !== 6) return null;
+    const num = parseInt(c, 16);
+    if (isNaN(num)) return null;
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return { r, g, b, str: `${r}, ${g}, ${b}` };
+  };
 
-      root.style.setProperty('--accent-pink', primary);
-      root.style.setProperty('--accent-pink-light', secondary);
-      root.style.setProperty('--bg-dark', bgDark);
-      root.style.setProperty('--text-main', textMain);
-      root.style.setProperty('--font-sans', font);
+  // Inject Theme CSS variables dynamically if defined across the entire public link
+  useEffect(() => {
+    if (theme || content?.themeAccentColor || content?.theme_accent_color) {
+      const root = document.documentElement;
 
       let config = theme?.configuration || theme?.tokens || {};
       if (typeof config === 'string') {
         try { config = JSON.parse(config); } catch { config = {}; }
       }
 
-      if (config.wine) root.style.setProperty('--bg-wine', config.wine);
-      if (config.burgundy) root.style.setProperty('--bg-burgundy', config.burgundy);
-      if (config.cardBg) root.style.setProperty('--bg-card', config.cardBg);
-      if (config.borderSubtle) root.style.setProperty('--border-subtle', config.borderSubtle);
-      if (config.borderActive) root.style.setProperty('--border-active', config.borderActive);
-      if (config.glowPink) root.style.setProperty('--glow-pink', config.glowPink);
+      const primary = content?.themeAccentColor || content?.theme_accent_color || theme?.primaryColor || theme?.primary_color || '#ff4d6d';
+      const secondary = theme?.secondaryColor || theme?.secondary_color || '#ff758f';
+      const bgDark = theme?.backgroundColor || theme?.background_color || '#0f0207';
+      const textMain = theme?.textColor || theme?.text_color || '#ffffff';
+      const font = theme?.fontFamily || theme?.font_family || 'Outfit';
+
+      const primaryRgb = hexToRgb(primary);
+      const secondaryRgb = hexToRgb(secondary);
+      const primaryStr = primaryRgb ? primaryRgb.str : (config.primaryRgb || '255, 77, 109');
+      const secondaryStr = secondaryRgb ? secondaryRgb.str : (config.secondaryRgb || '255, 117, 143');
+
+      // Core Color Variables
+      root.style.setProperty('--accent-pink', primary);
+      root.style.setProperty('--accent-pink-light', secondary);
+      root.style.setProperty('--accent-blush', `rgba(${primaryStr}, 0.85)`);
+      root.style.setProperty('--primary-rgb', primaryStr);
+      root.style.setProperty('--secondary-rgb', secondaryStr);
+
+      // Deep Atmospheric Background Variables
+      root.style.setProperty('--bg-dark', bgDark);
+      root.style.setProperty('--bg-wine', config.wine || '#220412');
+      root.style.setProperty('--bg-burgundy', config.burgundy || '#3a0820');
+      root.style.setProperty('--bg-card', config.cardBg || `rgba(${config.wine ? '20, 10, 30' : '35, 8, 22'}, 0.75)`);
+      root.style.setProperty('--bg-card-hover', config.cardHoverBg || `rgba(${config.wine ? '30, 15, 45' : '55, 12, 35'}, 0.85)`);
+
+      // Card & Selection Styling
+      const cardSelectedBg = config.cardSelectedBg || `linear-gradient(160deg, rgba(${primaryStr}, 0.35), rgba(15, 2, 7, 0.95))`;
+      root.style.setProperty('--card-selected-bg', cardSelectedBg);
+      root.style.setProperty('--border-subtle', config.borderSubtle || `rgba(${secondaryStr}, 0.22)`);
+      root.style.setProperty('--border-active', config.borderActive || `rgba(${primaryStr}, 0.75)`);
+      root.style.setProperty('--glow-pink', config.glowPink || `0 0 25px rgba(${primaryStr}, 0.5)`);
+      root.style.setProperty('--glow-primary', config.glowPink || `0 0 25px rgba(${primaryStr}, 0.5)`);
+
+      // Badges & Buttons
+      root.style.setProperty('--badge-bg', `rgba(${primaryStr}, 0.16)`);
+      root.style.setProperty('--badge-border', `rgba(${primaryStr}, 0.4)`);
+      root.style.setProperty('--btn-primary-bg', `linear-gradient(135deg, ${primary}, ${secondary})`);
+      root.style.setProperty('--btn-primary-hover-bg', `linear-gradient(135deg, ${secondary}, ${primary})`);
+      root.style.setProperty('--btn-yes-bg', `linear-gradient(135deg, ${primary}, ${secondary})`);
+      root.style.setProperty('--btn-yes-hover-bg', `linear-gradient(135deg, ${secondary}, ${primary})`);
+
+      // Typography
+      root.style.setProperty('--text-main', textMain);
+      root.style.setProperty('--font-sans', font);
     }
 
     return () => {
       // Reset variables on leave to prevent bleeding into dashboard
       const root = document.documentElement;
-      root.style.removeProperty('--accent-pink');
-      root.style.removeProperty('--accent-pink-light');
-      root.style.removeProperty('--bg-dark');
-      root.style.removeProperty('--bg-wine');
-      root.style.removeProperty('--bg-burgundy');
-      root.style.removeProperty('--bg-card');
-      root.style.removeProperty('--border-subtle');
-      root.style.removeProperty('--border-active');
-      root.style.removeProperty('--glow-pink');
-      root.style.removeProperty('--text-main');
-      root.style.removeProperty('--font-sans');
+      const properties = [
+        '--accent-pink', '--accent-pink-light', '--accent-blush', '--primary-rgb', '--secondary-rgb',
+        '--bg-dark', '--bg-wine', '--bg-burgundy', '--bg-card', '--bg-card-hover',
+        '--card-selected-bg', '--border-subtle', '--border-active', '--glow-pink', '--glow-primary',
+        '--badge-bg', '--badge-border', '--btn-primary-bg', '--btn-primary-hover-bg',
+        '--btn-yes-bg', '--btn-yes-hover-bg', '--text-main', '--font-sans'
+      ];
+      properties.forEach(p => root.style.removeProperty(p));
     };
   }, [theme, content]);
 
@@ -222,6 +262,8 @@ export default function InvitationRenderer({ data = {}, isPreview = false }) {
             scheduleMode={invitation.scheduleMode || 'strict'}
             dateText={selections.date || invitation.date?.text || 'Tomorrow'}
             timeText={selections.time || invitation.date?.time || '6:00 PM'}
+            startTime={content.picker_start_time || content.pickerStartTime || '6:00 PM'}
+            endTime={content.picker_end_time || content.pickerEndTime || '11:00 PM'}
             gifUrl={media.whenGif || '/gifs/when_tomorrow.gif'}
             title={content.sectionTitles?.when}
             subtitle={content.subtitles?.when}

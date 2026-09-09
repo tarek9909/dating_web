@@ -107,12 +107,12 @@
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  background: rgba(255, 77, 109, 0.14);
-  border: 1px solid rgba(255, 77, 109, 0.35);
+  background: var(--badge-bg, rgba(255, 77, 109, 0.14));
+  border: 1px solid var(--badge-border, rgba(255, 77, 109, 0.35));
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent-blush);
+  color: var(--accent-blush, #ffb3c1);
   letter-spacing: 0.4px;
   text-transform: uppercase;
   margin-bottom: 16px;
@@ -277,13 +277,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-pink), #c9184a);
+  background: var(--btn-primary-bg, linear-gradient(135deg, var(--accent-pink), var(--accent-pink-light)));
   color: #ffffff;
-  border: 1px solid rgba(255, 180, 200, 0.3);
+  border: 1px solid var(--border-subtle, rgba(255, 180, 200, 0.3));
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ff758f, #e01e5a);
+  background: var(--btn-primary-hover-bg, linear-gradient(135deg, var(--accent-pink-light), var(--accent-pink)));
   transform: translateY(-2px);
 }
 
@@ -295,18 +295,18 @@
 }
 
 .btn-yes {
-  background: linear-gradient(135deg, #ff4d6d, #b5179e);
+  background: var(--btn-yes-bg, linear-gradient(135deg, var(--accent-pink), var(--accent-pink-light)));
   color: #ffffff;
   font-size: 1.25rem;
   padding: 16px 36px;
-  border: 1px solid rgba(255, 200, 220, 0.4);
+  border: 1px solid var(--border-subtle, rgba(255, 200, 220, 0.4));
   font-weight: 700;
   letter-spacing: 0.5px;
   transition: transform 0.2s var(--ease-spring), box-shadow 0.2s ease;
 }
 
 .btn-yes:hover {
-  background: linear-gradient(135deg, #ff758f, #d01ba0);
+  background: var(--btn-yes-hover-bg, linear-gradient(135deg, var(--accent-pink-light), var(--accent-pink)));
 }
 
 .btn-no {
@@ -353,9 +353,9 @@
 .angry-modal {
   max-width: 400px;
   width: 100%;
-  background: linear-gradient(170deg, #3d0c24 0%, #200412 100%);
+  background: linear-gradient(170deg, var(--bg-burgundy, #3d0c24) 0%, var(--bg-wine, #200412) 100%);
   border: 2px solid var(--accent-pink);
-  box-shadow: var(--shadow-modal), 0 0 40px rgba(255, 77, 109, 0.4);
+  box-shadow: var(--shadow-modal), var(--glow-pink);
   border-radius: 28px;
   padding: 26px 20px;
   text-align: center;
@@ -390,8 +390,8 @@
   font-family: var(--font-serif);
   font-size: 2rem;
   font-weight: 800;
-  color: #ff4d6d;
-  text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
+  color: var(--accent-pink);
+  text-shadow: var(--glow-pink);
   margin-bottom: 12px;
   letter-spacing: -0.5px;
 }
@@ -484,9 +484,9 @@
 }
 
 .choice-card.is-selected {
-  background: linear-gradient(160deg, rgba(65, 14, 40, 0.95), rgba(40, 8, 25, 0.95));
+  background: var(--card-selected-bg, linear-gradient(160deg, rgba(65, 14, 40, 0.95), rgba(40, 8, 25, 0.95)));
   border: 2px solid var(--accent-pink);
-  box-shadow: 0 0 25px rgba(255, 77, 109, 0.5), 0 12px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--glow-pink), 0 12px 30px rgba(0, 0, 0, 0.6);
   transform: scale(1.02);
 }
 
@@ -494,9 +494,9 @@
   position: absolute;
   top: 10px;
   right: 12px;
-  background: rgba(255, 77, 109, 0.2);
-  border: 1px solid rgba(255, 77, 109, 0.4);
-  color: var(--accent-blush);
+  background: var(--badge-bg, rgba(255, 77, 109, 0.2));
+  border: 1px solid var(--badge-border, rgba(255, 77, 109, 0.4));
+  color: var(--accent-blush, #ffb3c1);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -757,8 +757,8 @@
 }
 
 .celebration-pill {
-  background: rgba(255, 77, 109, 0.25);
-  border-color: var(--accent-pink);
+  background: var(--badge-bg, rgba(255, 77, 109, 0.25));
+  border: 1px solid var(--accent-pink);
   color: #ffffff;
 }
 
@@ -768,7 +768,7 @@
   margin: 0 auto 14px;
   border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 180, 200, 0.25);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-subtle, rgba(255, 180, 200, 0.25));
 }
 
 .final-title {
@@ -776,7 +776,7 @@
   font-size: clamp(2rem, 6.5vw, 2.7rem);
   font-weight: 800;
   color: #ffffff;
-  text-shadow: 0 0 25px rgba(255, 77, 109, 0.6);
+  text-shadow: var(--glow-pink);
   margin-bottom: 8px;
   letter-spacing: -0.5px;
 }

@@ -15,7 +15,7 @@ const requestSchema = z.object({
 });
 
 const eventSchema = z.object({
-  eventType: z.enum(['view', 'yes_click', 'no_click', 'location_select', 'food_select', 'share_click', 'rsvp_complete']),
+  eventType: z.enum(['view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete']),
   sessionKey: z.string().max(100).optional(),
   eventData: z.record(z.any()).optional(),
 });

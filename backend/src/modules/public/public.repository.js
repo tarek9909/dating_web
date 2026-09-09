@@ -61,7 +61,8 @@ export const publicRepository = {
               l.emoji,
               COALESCE(il.custom_image_url, l.image_url) AS image_url,
               COALESCE(il.custom_image_url, l.image_url) AS imageUrl,
-              l.category AS tag
+              COALESCE(il.custom_tag, l.category) AS tag,
+              il.custom_tag
        FROM invitation_locations il
        JOIN locations l ON il.location_id = l.id
        WHERE il.invitation_id = ?
@@ -75,8 +76,10 @@ export const publicRepository = {
               COALESCE(ifo.custom_name, f.name) AS name,
               COALESCE(ifo.custom_description, f.description) AS description,
               COALESCE(ifo.custom_emoji, f.emoji) AS emoji,
+              COALESCE(ifo.custom_tag, f.emoji, 'Adventure') AS tag,
               COALESCE(ifo.custom_image_url, f.image_url) AS image_url,
-              COALESCE(ifo.custom_image_url, f.image_url) AS imageUrl
+              COALESCE(ifo.custom_image_url, f.image_url) AS imageUrl,
+              ifo.custom_tag
        FROM invitation_food_options ifo
        JOIN food_options f ON ifo.food_option_id = f.id
        WHERE ifo.invitation_id = ?
@@ -178,6 +181,10 @@ export const publicRepository = {
           message: content.final_message,
         },
         themeAccentColor: content.theme_accent_color || null,
+        picker_start_time: content.picker_start_time || '6:00 PM',
+        picker_end_time: content.picker_end_time || '11:00 PM',
+        pickerStartTime: content.picker_start_time || '6:00 PM',
+        pickerEndTime: content.picker_end_time || '11:00 PM',
       },
       theme: {
         id: inv.theme_id || 1,

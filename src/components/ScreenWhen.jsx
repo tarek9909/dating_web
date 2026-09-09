@@ -1,11 +1,54 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, Lock, CheckCircle2, Sparkles } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Calendar, Clock, Lock, Sparkles } from 'lucide-react';
 import { sound } from '../utils/sound';
+
+export function parseTimeToMinutes(timeStr) {
+  if (!timeStr) return 18 * 60; // 6:00 PM
+  const s = String(timeStr).trim().toLowerCase();
+  const match = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/);
+  if (!match) return 18 * 60;
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  const period = match[3];
+
+  if (period === 'pm' && hours < 12) hours += 12;
+  if (period === 'am' && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+export function formatMinutesToTime(totalMinutes) {
+  const mins = ((totalMinutes % 1440) + 1440) % 1440;
+  const hours = Math.floor(mins / 60);
+  const m = mins % 60;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  let displayHour = hours % 12;
+  if (displayHour === 0) displayHour = 12;
+  const displayMins = m === 0 ? '00' : m < 10 ? `0${m}` : m;
+  return `${displayHour}:${displayMins} ${period}`;
+}
+
+export function generateHoursRange(startTimeStr, endTimeStr, intervalMinutes = 30) {
+  const startMins = parseTimeToMinutes(startTimeStr || '6:00 PM');
+  let endMins = parseTimeToMinutes(endTimeStr || '11:00 PM');
+
+  // Handle cross-midnight (e.g. 9:00 PM to 2:00 AM)
+  if (endMins <= startMins) {
+    endMins += 1440;
+  }
+
+  const slots = [];
+  for (let m = startMins; m <= endMins; m += intervalMinutes) {
+    slots.push(formatMinutesToTime(m));
+  }
+  return slots.length > 0 ? slots : ['6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM'];
+}
 
 export default function ScreenWhen({
   scheduleMode = 'strict',
   dateText = 'TOMORROW',
   timeText = '6:00 PM',
+  startTime = '6:00 PM',
+  endTime = '11:00 PM',
   gifUrl = '/gifs/when_tomorrow.gif',
   title = 'When? ⏰',
   subtitle,
@@ -37,10 +80,13 @@ export default function ScreenWhen({
   };
 
   const daysList = generateDays();
-  const [chosenDay, setChosenDay] = useState(dateText || daysList[0].fullFormatted);
-  const [chosenTime, setChosenTime] = useState(timeText || '7:00 PM');
+  const availableTimes = useMemo(() => generateHoursRange(startTime, endTime, 30), [startTime, endTime]);
 
-  const popularTimes = ['6:00 PM', '7:00 PM', '8:00 PM', '8:30 PM', '9:00 PM'];
+  const [chosenDay, setChosenDay] = useState(dateText || daysList[0].fullFormatted);
+  const [chosenTime, setChosenTime] = useState(() => {
+    if (timeText && availableTimes.includes(timeText)) return timeText;
+    return availableTimes[0] || '7:00 PM';
+  });
 
   const handleConfirmPicker = () => {
     sound.playPop();
@@ -154,14 +200,14 @@ export default function ScreenWhen({
                       flex: '0 0 auto',
                       padding: '10px 14px',
                       borderRadius: '12px',
-                      border: isSelected ? '2px solid #ff4d6d' : '1px solid rgba(255, 77, 109, 0.25)',
-                      background: isSelected ? 'rgba(255, 77, 109, 0.25)' : 'rgba(20, 4, 12, 0.5)',
-                      color: isSelected ? '#fff' : '#ffb3c1',
+                      border: isSelected ? '2px solid var(--accent-pink)' : '1px solid var(--border-subtle, rgba(255, 77, 109, 0.25))',
+                      background: isSelected ? 'var(--badge-bg, rgba(255, 77, 109, 0.25))' : 'rgba(20, 4, 12, 0.5)',
+                      color: isSelected ? '#fff' : 'var(--accent-blush, #ffb3c1)',
                       cursor: 'pointer',
                       textAlign: 'center',
                       minWidth: '70px',
                       transition: 'all 0.2s ease',
-                      boxShadow: isSelected ? '0 0 12px rgba(255, 77, 109, 0.4)' : 'none'
+                      boxShadow: isSelected ? 'var(--glow-pink, 0 0 12px rgba(255, 77, 109, 0.4))' : 'none'
                     }}
                   >
                     <div style={{ fontSize: '11px', fontWeight: 600, opacity: 0.8 }}>{d.label}</div>
@@ -174,11 +220,17 @@ export default function ScreenWhen({
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#ffc2d1', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
-              2. Choose Preferred Time:
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
-              {popularTimes.map((t) => {
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent-blush, #ffc2d1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                2. Choose Preferred Hour:
+              </label>
+              <span style={{ fontSize: '11px', color: 'var(--accent-blush, #ffb3c1)', opacity: 0.85, fontWeight: 600 }}>
+                Window: {startTime} – {endTime}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', maxHeight: '160px', overflowY: 'auto', paddingRight: '4px' }}>
+              {availableTimes.map((t) => {
                 const isSelected = chosenTime === t;
                 return (
                   <button
@@ -189,17 +241,19 @@ export default function ScreenWhen({
                       setChosenTime(t);
                     }}
                     style={{
-                      padding: '6px 14px',
+                      padding: '7px 14px',
                       borderRadius: '999px',
-                      border: isSelected ? '2px solid #ff4d6d' : '1px solid rgba(255, 77, 109, 0.25)',
-                      background: isSelected ? 'rgba(255, 77, 109, 0.25)' : 'rgba(20, 4, 12, 0.5)',
-                      color: isSelected ? '#fff' : '#ffc2d1',
+                      border: isSelected ? '2px solid var(--accent-pink)' : '1px solid var(--border-subtle, rgba(255, 77, 109, 0.25))',
+                      background: isSelected ? 'var(--badge-bg, rgba(255, 77, 109, 0.35))' : 'rgba(20, 4, 12, 0.5)',
+                      color: isSelected ? '#fff' : 'var(--accent-blush, #ffc2d1)',
                       fontSize: '12px',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '5px',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isSelected ? 'var(--glow-pink, 0 0 10px rgba(255, 77, 109, 0.5))' : 'none'
                     }}
                   >
                     <Clock size={12} />
@@ -212,9 +266,9 @@ export default function ScreenWhen({
 
           <div style={{
             padding: '12px 16px',
-            background: 'rgba(255, 77, 109, 0.1)',
-            border: '1px solid rgba(255, 77, 109, 0.25)',
-            borderRadius: '10px',
+            background: 'var(--badge-bg, rgba(255, 77, 109, 0.12))',
+            border: '1px solid var(--border-active, rgba(255, 77, 109, 0.3))',
+            borderRadius: '12px',
             textAlign: 'center',
             fontSize: '13px',
             color: '#fff'
