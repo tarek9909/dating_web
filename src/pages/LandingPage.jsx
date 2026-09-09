@@ -419,13 +419,13 @@ export default function LandingPage() {
             <div className="gsap-hero-badge inline-flex items-center gap-space-xs px-space-md py-space-2xs rounded-full bg-white/95 border border-rose-200/80 shadow-[0_4px_16px_rgba(185,0,64,0.06)] mb-space-lg transition-transform duration-300 hover:scale-105">
               <span className="material-symbols-outlined text-primary text-[16px]">sentiment_satisfied</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold tracking-wider">
-                Mesh ra7 te2dar/te2dri t2oul/t2ouli la2 🇱🇧
+                Mesh ra7 te2dar t2oul la2 🇱🇧
               </span>
             </div>
 
             {/* Editorial Headline with Lebanese Flair */}
             <h1 className="gsap-hero-title max-w-4xl font-display-xl text-[40px] md:text-[58px] leading-[1.15] tracking-tight text-on-surface mb-space-md font-bold">
-              Badel ma tes2al/tes2ali "Btetla3/btetla3i ma3e?" khallikoun tsarrkho:
+              Badel ma tes2al "Btetla3 ma3e?" khallikoun tsarrkho
               <span className="block mt-space-2xs text-transparent bg-clip-text bg-gradient-to-r from-primary via-rose-600 to-amber-500 font-extrabold">
                 "Yalla Yes!"
               </span>
@@ -433,7 +433,7 @@ export default function LandingPage() {
 
             {/* Subtitle */}
             <p className="gsap-hero-subtitle max-w-2xl font-body-lg text-body-lg text-on-surface-variant mb-space-2xl leading-relaxed font-normal">
-              Da3weh interactive mfassaleh 3al milli la ma te2dar/te2dri ella ma t2oul/t2ouli Yes 😉 ma3 zer &quot;La2&quot; byehrob kel ma tjarrib/tjarbi tekbso/tekbsi, celebration beats, ekhtiyar l akel wl meshwar, w boarding pass rasmiyeh direct 3al WhatsApp.
+              Da3weh interactive mfassaleh 3al milli la ma te2dar ella ma t2oul Yes 😉 ma3 zer &quot;La2&quot; byehrob kel ma tjarrib tekbso, celebration beats, ekhtiyar l akel wl meshwar, w boarding pass rasmiyeh direct 3al WhatsApp.
             </p>
 
             {/* Dual Actions */}
@@ -442,13 +442,13 @@ export default function LandingPage() {
                 onClick={() => scrollToSection('request-section')}
                 className="gsap-hero-action px-space-2xl py-3.5 rounded-full bg-gradient-to-r from-primary via-rose-600 to-primary-container text-white font-label-lg text-label-lg font-bold tracking-wider shadow-[0_8px_25px_rgba(227,23,84,0.35)] hover:shadow-[0_12px_32px_rgba(227,23,84,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
               >
-                Jehezli/Jehezileh l link →
+                Jehezli l link →
               </button>
               <button
                 onClick={() => scrollToSection('demo-section')}
                 className="gsap-hero-action px-space-xl py-3.5 rounded-full bg-white/90 border border-rose-200 text-on-surface font-label-lg text-label-lg font-semibold shadow-sm hover:border-primary-container hover:text-primary transition-all duration-300 cursor-pointer"
               >
-                Jarreb/Jarbi ohrob/horbi men l Yes
+                Jarreb ohrob men l Yes
               </button>
             </div>
 
@@ -496,7 +496,7 @@ export default function LandingPage() {
                   Jarreb bi Idak 🎯
                 </span>
                 <h2 className="font-headline-md text-headline-md text-on-surface mt-space-2xs font-bold">
-                  Jarreb/Jarbi tkbous/tekbsi "La2" iza fik/fikie 😉
+                  Jarreb tkbous "La2" iza fik 😉
                 </h2>
               </div>
 
@@ -539,7 +539,7 @@ export default function LandingPage() {
                   Maya ❤️
                 </p>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-space-sm font-bold">
-                  Btetla3/btetla3i ma3e date hal weekend? 🍕
+                  Btetla3i ma3e date hal weekend? 🍕
                 </h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs mb-space-xl">
                   Na22o 3al rawa2.. bass ntebho l zer byohrob!
@@ -628,10 +628,10 @@ export default function LandingPage() {
                       2alet Yalla Yes! 🎉
                     </span>
                     <h4 className="font-display-lg text-display-lg text-on-surface mt-space-2xs mb-space-xs font-bold">
-                      Mabrouk Ya King/Queen! ❤️
+                      Mabrouk Ya King! ❤️
                     </h4>
                     <p className="font-body-md text-body-md text-on-surface-variant mb-space-lg max-w-xs leading-relaxed">
-                      L meshwar sar rasmi! L ticket nkhadmet wl tafasil weslo 3al WhatsApp. Jehhiz/Jehzi 7alak/ik lal sahra! 🇱🇧
+                      L meshwar sar rasmi! L ticket nkhadmet wl tafasil weslo 3al WhatsApp. Jehhiz 7alak lal sahra! 🇱🇧
                     </p>
                     <div className="px-space-md py-space-xs rounded-xl bg-surface-container-low border border-rose-200 text-primary font-label-md text-label-md font-semibold flex items-center gap-space-xs">
                       <span className="material-symbols-outlined text-[18px]">verified</span>
@@ -657,11 +657,11 @@ export default function LandingPage() {
                   Gharam 3al Rawa2 💖
                 </span>
                 <h2 className="font-display-lg text-display-lg text-on-surface tracking-tight mt-space-2xs font-bold">
-                  Leh ra7 t2oul/t2ouli "Yes" ghasben 3annak/ik?
+                  Leh ra7 t2oul "Yes" ghasben 3annak?
                 </h2>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-                Kel shi ma3moul la tefra7/tefra7i w tkayyif/tkayfi 3al date, w tkoun zekra ma btentasa.
+                Kel shi ma3moul la tefra7 w tkayyif 3al date, w tkoun zekra ma btentasa.
               </p>
             </div>
 
@@ -826,7 +826,7 @@ export default function LandingPage() {
                     Ticket rasmiyeh 3al WhatsApp 🎫
                   </h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                    Bass tekbous/tekbsi Yes, deghre byenshana3 carte rasmi lal meshwar ma3 l wa2et wl matra7, w byousal risalet WhatsApp jehze lal share.
+                    Bass tekbous Yes, deghre byenshana3 carte rasmi lal meshwar ma3 l wa2et wl matra7, w byousal risalet WhatsApp jehze lal share.
                   </p>
                 </div>
 
@@ -881,10 +881,10 @@ export default function LandingPage() {
                   01
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-space-xs font-bold">
-                  Btektob/btektbi l tafasil
+                  Btektob l tafasil
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  3abbe/3abbi l form bil esem, l noukat benatkoun, w chou 3abalak/ik meshwar bi hal form.
+                  3abbe l form bil esem, l noukat benatkoun, w chou 3abalak meshwar bi hal form.
                 </p>
               </div>
 
@@ -894,10 +894,10 @@ export default function LandingPage() {
                   02
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-space-xs font-bold">
-                  Mnhaddirlak/ik l link
+                  Mnhaddirlak l link
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  Ne7na mn3mlak/ik saf7et da3weh ma3 zer "La2" yalle byohrob wl aswat l mahdoumeh.
+                  Ne7na mn3mlak saf7et da3weh ma3 zer "La2" yalle byohrob wl aswat l mahdoumeh.
                 </p>
               </div>
 
@@ -907,10 +907,10 @@ export default function LandingPage() {
                   03
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-space-xs font-bold">
-                  Bteb3atla/bteb3atlo l link
+                  Bteb3atla l link
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  Bteb3atla/bteb3atlo l link 3al WhatsApp, bas tjarreb/yjarreb tekbous/yekbous la2, bta3tik/bya3tik Yes rasmiyeh ma3 ticket!
+                  Bteb3atla l link 3al WhatsApp, bas tjarreb tekbous la2, bta3tik Yes rasmiyeh ma3 ticket!
                 </p>
               </div>
             </div>
@@ -934,7 +934,7 @@ export default function LandingPage() {
                 <div className="flex justify-center mb-space-lg">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-50 border border-rose-200/80 shadow-sm text-primary font-label-sm text-[11px] font-bold tracking-wider uppercase">
                     <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                    <span>Wasel 3andak/ik 3al WhatsApp bi se3tein ⚡</span>
+                    <span>Wasel 3andak 3al WhatsApp bi se3tein ⚡</span>
                   </div>
                 </div>
 
@@ -946,10 +946,10 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <h2 className="font-headline-md text-[28px] sm:text-[32px] text-on-surface font-bold tracking-tight">
-                    Sammem/Sammi Da3wtak
+                    Sammem Da3wtak
                   </h2>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mt-2 max-w-md mx-auto">
-                    Bta3tina l tafasil, w ne7na mnhaddirlak/ik l link w mneb3atlak/ik yeh deghre 3al WhatsApp bala ayya ta32id.
+                    Bta3tina l tafasil, w ne7na mnhaddirlak l link w mneb3atlak yeh deghre 3al WhatsApp bala ayya ta32id.
                   </p>
                 </div>
 
@@ -958,10 +958,10 @@ export default function LandingPage() {
                     <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm">
                       <span className="material-symbols-outlined text-[32px]">check_circle</span>
                     </div>
-                    <h3 className="font-headline-sm font-bold text-on-surface text-[22px]">Wosol talabak/ik ya batal/bataleh! ❤️</h3>
+                    <h3 className="font-headline-sm font-bold text-on-surface text-[22px]">Wosol talabak ya batal! ❤️</h3>
                     <p className="font-body-md text-on-surface-variant max-w-md leading-relaxed">
-                      Yislam dayyetak/ik ya <strong>{formData.name}</strong>! Stalamna tafasil talabak/ik la{' '}
-                      <strong>{formData.recipientName}</strong>. Fari2na 3am yjehhiz l link w ra7 netwasal ma3ak/ik deghre 3al WhatsApp 3al raqam{' '}
+                      Yislam dayyetak ya <strong>{formData.name}</strong>! Stalamna tafasil talabak la{' '}
+                      <strong>{formData.recipientName}</strong>. Fari2na 3am yjehhiz l link w ra7 netwasal ma3ak deghre 3al WhatsApp 3al raqam{' '}
                       <span className="text-primary font-semibold dir-ltr">{formData.phone}</span>.
                     </p>
                     <button
@@ -988,7 +988,7 @@ export default function LandingPage() {
                       <div className="flex flex-col gap-1.5 text-left">
                         <label className="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
                           <span className="material-symbols-outlined text-[16px] text-primary">person</span>
-                          <span>Esmak/ik l karim *</span>
+                          <span>Esmak l karim *</span>
                         </label>
                         <div className="relative">
                           <input
@@ -1006,7 +1006,7 @@ export default function LandingPage() {
                       <div className="flex flex-col gap-1.5 text-left">
                         <label className="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
                           <span className="material-symbols-outlined text-[16px] text-rose-500">favorite</span>
-                          <span>Esem l ghali / l ghalyeh *</span>
+                          <span>Esem l ghalyeh *</span>
                         </label>
                         <div className="relative">
                           <input
@@ -1066,7 +1066,7 @@ export default function LandingPage() {
                       <div className="flex items-center justify-between">
                         <label className="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
                           <span className="material-symbols-outlined text-[16px] text-amber-500">auto_awesome</span>
-                          <span>Chou l fekra b-belak/ik?</span>
+                          <span>Chou l fekra b-belak?</span>
                         </label>
                         <span className="text-[11px] text-on-surface-variant/70 font-medium">Ekhtiyari</span>
                       </div>
@@ -1110,11 +1110,11 @@ export default function LandingPage() {
                         {loading ? (
                           <>
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            <span>3am njehezlak/ik l link...</span>
+                            <span>3am njehezlak l link...</span>
                           </>
                         ) : (
                           <>
-                            <span>Yalla Jehezli/Jehezileh L Link</span>
+                            <span>Yalla Jehezli L Link</span>
                             <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">
                               arrow_forward
                             </span>
