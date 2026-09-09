@@ -128,9 +128,10 @@ export default function InvitationRenderer({ data = {}, isPreview = false }) {
 
   const sendEvent = (eventType, eventData = {}) => {
     if (!isPreview && invitation.slug) {
+      const payload = typeof eventData === 'object' && eventData !== null ? eventData : { value: eventData };
       api.public.recordEvent(invitation.slug, {
         eventType,
-        eventData
+        eventData: payload
       }).catch(() => {});
     }
   };
@@ -142,7 +143,7 @@ export default function InvitationRenderer({ data = {}, isPreview = false }) {
   };
 
   const handleRestart = () => {
-    sendEvent('button_click', 'final', { action: 'restart' });
+    sendEvent('button_click', { action: 'restart', screen: 'final' });
     setSelections({
       location: '',
       food: '',

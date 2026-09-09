@@ -399,7 +399,7 @@ CREATE TABLE IF NOT EXISTS invitation_media (
 CREATE TABLE IF NOT EXISTS invitation_events (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     invitation_id BIGINT UNSIGNED NOT NULL,
-    event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete') NOT NULL,
+    event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete', 'button_click', 'restart_click') NOT NULL,
     session_key VARCHAR(100) NULL,
     ip_hash CHAR(64) NULL,
     user_agent VARCHAR(500) NULL,

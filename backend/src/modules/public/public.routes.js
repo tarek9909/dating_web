@@ -15,9 +15,25 @@ const requestSchema = z.object({
 });
 
 const eventSchema = z.object({
-  eventType: z.enum(['view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete']),
+  eventType: z.enum([
+    'view',
+    'yes_click',
+    'no_click',
+    'location_select',
+    'food_select',
+    'date_select',
+    'share_click',
+    'rsvp_complete',
+    'button_click',
+    'restart_click',
+  ]),
   sessionKey: z.string().max(100).optional(),
-  eventData: z.record(z.any()).optional(),
+  eventData: z.union([z.record(z.any()), z.string(), z.number(), z.boolean(), z.null()]).optional().transform((val) => {
+    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+      return { value: val };
+    }
+    return val || {};
+  }),
 });
 
 router.post('/requests', publicRequestLimiter, validate(requestSchema), publicController.submitRequest);

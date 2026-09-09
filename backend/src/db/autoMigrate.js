@@ -187,7 +187,7 @@ export async function runAutoMigrations() {
     try {
       await pool.query(`
         ALTER TABLE invitation_events
-        MODIFY COLUMN event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete') NOT NULL
+        MODIFY COLUMN event_type ENUM('view', 'yes_click', 'no_click', 'location_select', 'food_select', 'date_select', 'share_click', 'rsvp_complete', 'button_click', 'restart_click') NOT NULL
       `);
     } catch (err) {
       console.warn('[AutoMigrate] Notice on invitation_events ENUM update:', err.message);
