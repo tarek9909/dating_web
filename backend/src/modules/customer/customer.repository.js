@@ -160,6 +160,19 @@ export const customerRepository = {
   },
 
   async updateInvitationDetails(invitationId, { recipientName, dateType, scheduleMode, dateValue, dateText, timeValue, timezone, dressCode, dressCodeText, internalTitle, themeId }) {
+    let safeThemeId = themeId;
+    if (themeId) {
+      try {
+        const [thRows] = await pool.execute('SELECT id FROM themes WHERE id = ?', [themeId]);
+        if (thRows.length === 0) {
+          const [fallback] = await pool.execute('SELECT id FROM themes ORDER BY id ASC LIMIT 1');
+          safeThemeId = fallback[0] ? fallback[0].id : null;
+        }
+      } catch {
+        safeThemeId = null;
+      }
+    }
+
     await pool.execute(
       `UPDATE invitations
        SET recipient_name = COALESCE(?, recipient_name),
@@ -178,7 +191,7 @@ export const customerRepository = {
         recipientName || null, dateType || null, scheduleMode || null, dateValue || null,
         dateText || null, timeValue || null, timezone || null,
         dressCode || null, dressCodeText || null, internalTitle || null,
-        themeId || null,
+        safeThemeId || null,
         invitationId
       ]
     );
