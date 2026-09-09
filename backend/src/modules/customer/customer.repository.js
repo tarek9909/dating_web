@@ -19,7 +19,10 @@ export const customerRepository = {
   },
 
   async getCustomerDashboard(customerId) {
-    return this.getDashboard(customerId);
+    if (typeof this?.getDashboard === 'function') {
+      return this.getDashboard(customerId);
+    }
+    return customerRepository.getDashboard(customerId);
   },
 
   async getInvitationsByCustomer(customerId) {

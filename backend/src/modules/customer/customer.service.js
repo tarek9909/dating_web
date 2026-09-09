@@ -29,7 +29,13 @@ function assertInvitationNotClaimed(invitation) {
 
 export const customerService = {
   async getDashboard(customerId) {
-    return customerRepository.getDashboard(customerId);
+    if (typeof customerRepository.getDashboard === 'function') {
+      return customerRepository.getDashboard(customerId);
+    }
+    if (typeof customerRepository.getCustomerDashboard === 'function') {
+      return customerRepository.getCustomerDashboard(customerId);
+    }
+    throw new Error('customerRepository dashboard method not available');
   },
 
   async getInvitations(customerId) {
